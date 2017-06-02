@@ -7,6 +7,9 @@ public class Cache {
 	private String[][] cache;
 	private int tLinha;
 	private int tColuna;
+	
+	private int countHit = 0;
+	private int countMiss = 0;
 
 	private ArrayList<String> relatorio;
 
@@ -45,6 +48,7 @@ public class Cache {
 
 		if (cache[linha][0] == null || !cache[linha][0].equals(tag) || !cache[linha][palavra].equals(endereco)) {
 			relatorio.add("Miss;");
+			countMiss++;
 			cache[linha][0] = tag;
 			for (int i = 1; i < tColuna; i++) {
 				switch (i) {
@@ -70,6 +74,7 @@ public class Cache {
 			}
 		} else {
 			relatorio.add("HIT;");
+			countHit++;
 		}
 	}
 
@@ -104,6 +109,10 @@ public class Cache {
 			System.out.printf(str);
 			count++;
 		}
+		float total = countHit + countMiss;
+		System.out.println();
+		System.out.println("Percentual de Miss: " + ((100*countMiss)/total) + "%");
+		System.out.println("Percentual de Hit: " + ((100*countHit)/total) + "%");
 	}
 
 }
