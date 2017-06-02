@@ -78,12 +78,64 @@ public class Cache {
 		}
 	}
 
+	//Mapeamento direto, com 3 bits para tag, 3 bits para linha e 2 bits
+	//para palavra (cache com 8 linhas, 4 palavras por linha).
 	private void adicionaDois(String endereco) {
-		//FALTA FAZER (SEGUIR MODELO DO DE CIMA)
+		String tag = endereco.substring(0, 3);
+		int linha = Integer.parseInt(endereco.substring(3, 6), 2);
+		int palavra = Integer.parseInt(endereco.substring(6, 8), 2) + 1;
+
+		if (cache[linha][0] == null || !cache[linha][0].equals(tag) || !cache[linha][palavra].equals(endereco)) {
+			//System.out.println(cache[linha][0] + "==NULL || "+ tag + " end: "+cache[linha][palavra] +"==" + endereco );
+			relatorio.add("Miss;");
+			countMiss++;
+			cache[linha][0] = tag;
+			for (int i = 1; i < tColuna; i++) {
+				switch (i) {
+				case 1:
+					cache[linha][i] = endereco.substring(0, 6) + "00";	break;
+				case 2:
+					cache[linha][i] = endereco.substring(0, 6) + "01";	break;
+				case 3:
+					cache[linha][i] = endereco.substring(0, 6) + "10";	break;
+				case 4:
+					cache[linha][i] = endereco.substring(0, 6) + "11";	break;				
+				default:
+					throw new RuntimeException("Erro no switch case");
+				}
+			}
+		} else {
+			relatorio.add("HIT;");
+			countHit++;
+		}
 	}
 
+	//Mapeamento direto, com 3 bits para tag, 4 bits para linha e 1 bit
+	//para palavra (cache com 16 linhas, 2 palavras por linha).
+
 	private void adicionaTres(String endereco) {
-		//FALTA FAZER (SEGUIR MODELO DO DE CIMA)
+		String tag = endereco.substring(0, 3);
+		int linha = Integer.parseInt(endereco.substring(3, 7), 2);
+		int palavra = Integer.parseInt(endereco.substring(7, 8), 2) + 1;
+
+		if (cache[linha][0] == null || !cache[linha][0].equals(tag) || !cache[linha][palavra].equals(endereco)) {
+			relatorio.add("Miss;");
+			countMiss++;
+			cache[linha][0] = tag;
+			for (int i = 1; i < tColuna; i++) {
+				switch (i) {
+				case 1:
+					cache[linha][i] = endereco.substring(0, 6) + "00";	break;
+				case 2:
+					cache[linha][i] = endereco.substring(0, 6) + "01";	break;		
+				default:
+					throw new RuntimeException("Erro no switch case");
+				}
+			}
+		} else {
+			relatorio.add("HIT;");
+			countHit++;
+		}
 	}
 
 	public void printa() {
@@ -110,7 +162,7 @@ public class Cache {
 			count++;
 		}
 		float total = countHit + countMiss;
-		System.out.println();
+		System.out.println('\n');
 		System.out.println("Percentual de Miss: " + ((100*countMiss)/total) + "%");
 		System.out.println("Percentual de Hit: " + ((100*countHit)/total) + "%");
 	}
