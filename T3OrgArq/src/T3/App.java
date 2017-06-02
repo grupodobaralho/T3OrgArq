@@ -1,7 +1,16 @@
 package T3;
 
 public class App {
-//YO ISRRA DROP IT HARD
+
+	public static void main(String args[]) {
+
+	HexToBin converser = new HexToBin();
 	
-	//DIEGO PUTAO
+	
+	String teste = converser.hexToBin("0B");
+	
+	System.out.println(teste);
+	
+	}
+
 }
