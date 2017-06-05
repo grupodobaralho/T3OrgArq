@@ -6,31 +6,9 @@ public class App {
 
 	public static void main(String args[]) throws IOException {
 
-		HexToBin converser = new HexToBin();
-
-		String[] teste = converser.read();
-
-		/*
-		for (int i = 0; i < teste.length; i++) {
-			if (teste[i] != null)
-				System.out.println(teste[i]);
-
-		}
-		*/
+		String[] teste = HexToBin.read();
 		
-		//ESTE FOI UM TESTE DE MESA QUE EU FIZ E FUNCIONOU!
-		/*
-		Cache cache = new Cache(4,8);
-		System.out.printf("%-9s %-9s %-9s %-9s %-9s %-9s %-9s %-9s %-9s\n", "TAG", "000", "001", "010", "011", "100", "101", "110", "111");
-		System.out.println("-----------------------------------------------------------------------------------------");
-		cache.add("00101011");
-		cache.add("00101011");
-		cache.add("00101010");
-		cache.add("11011111");
-		cache.printa();
-		*/
-		
-		//TESTANDO COM A LEITURA DO VINIBOY
+		//Cache(int bitsTag, int bitsLinha, int bitsPalavra)
 		Cache cache1 = new Cache(3,2,3);
 		for(int i=0; i<teste.length; i++) {
 			cache1.add(teste[i]);

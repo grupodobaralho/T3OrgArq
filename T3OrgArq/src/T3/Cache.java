@@ -3,6 +3,9 @@ package T3;
 import java.util.ArrayList;
 
 public class Cache {
+	
+	public static int TAM_BYTE = 8;
+	public static int BINARIO = 2;
 
 	private int bitsTag;
 	private int bitsLinha;
@@ -35,51 +38,18 @@ public class Cache {
 
 	}
 
+	// Mapeamento direto, com bitsTag bits para tag, bitsLinha bits para linha e
+	// bitsPalavra (cache com 4 linhas, 8 palavras por linha).
 	public void add(String endereco) {
-
-		if (tLinha == 4 && tColuna == 8) {
-			adicionaUm(endereco);
-		} else if (tLinha == 8 && tColuna == 4) {
-			adicionaDois(endereco);
-		} else if (tLinha == 16 && tColuna == 2) {
-			adicionaTres(endereco);
-		} else {
-			throw new RuntimeException("Erro no add da classe Cache!");
-		}
-
-	}
-
-	// Mapeamento direto, com 3 bits para tag, 2 bits para linha e 3 bits
-	// para palavra (cache com 4 linhas, 8 palavras por linha).
-	public void adicionaUm(String endereco) {
-		int linha = Integer.parseInt(endereco.substring(3, 5), 2);
-		int palavra = Integer.parseInt(endereco.substring(5, 8), 2);
+		int linha = Integer.parseInt(endereco.substring(bitsTag, bitsTag + bitsLinha), BINARIO);
+		int palavra = Integer.parseInt(endereco.substring(bitsTag + bitsLinha, TAM_BYTE), BINARIO);
 
 		if (tag[linha] == null || !cache[linha][palavra].equals(endereco)) {
 			relatorio.add("MISS\t");
 			countMiss++;
-			tag[linha] = endereco.substring(0, 3);
+			tag[linha] = endereco.substring(0, bitsTag);
 			for (int i = 0; i < tColuna; i++) {
-				switch (i) {
-				case 0:
-					cache[linha][i] = endereco.substring(0, 5) + "000";	break;
-				case 1:
-					cache[linha][i] = endereco.substring(0, 5) + "001";	break;
-				case 2:
-					cache[linha][i] = endereco.substring(0, 5) + "010";	break;
-				case 3:
-					cache[linha][i] = endereco.substring(0, 5) + "011";	break;
-				case 4:
-					cache[linha][i] = endereco.substring(0, 5) + "100";	break;
-				case 5:
-					cache[linha][i] = endereco.substring(0, 5) + "101";	break;
-				case 6:
-					cache[linha][i] = endereco.substring(0, 5) + "110";	break;
-				case 7:
-					cache[linha][i] = endereco.substring(0, 5) + "111";	break;
-				default:
-					throw new RuntimeException("Erro no switch case");
-				}
+				cache[linha][i] = endereco.substring(0, TAM_BYTE - bitsPalavra) + decToBin(i);
 			}
 		} else {
 			relatorio.add("HIT\t");
@@ -87,63 +57,13 @@ public class Cache {
 		}
 	}
 
-	//Mapeamento direto, com 3 bits para tag, 3 bits para linha e 2 bits
-	//para palavra (cache com 8 linhas, 4 palavras por linha).
-	private void adicionaDois(String endereco) {
-		int linha = Integer.parseInt(endereco.substring(3, 6), 2);
-		int palavra = Integer.parseInt(endereco.substring(6, 8), 2);
-
-		if (tag[linha] == null || !cache[linha][palavra].equals(endereco)) {
-			//System.out.println(cache[linha][0] + "==NULL || "+ tag + " end: "+cache[linha][palavra] +"==" + endereco );
-			relatorio.add("MISS\t");
-			countMiss++;
-			tag[linha] = endereco.substring(0, 3);
-			for (int i = 0; i < tColuna; i++) {
-				switch (i) {
-				case 0:
-					cache[linha][i] = endereco.substring(0, 6) + "00";	break;
-				case 1:
-					cache[linha][i] = endereco.substring(0, 6) + "01";	break;
-				case 2:
-					cache[linha][i] = endereco.substring(0, 6) + "10";	break;
-				case 3:
-					cache[linha][i] = endereco.substring(0, 6) + "11";	break;				
-				default:
-					throw new RuntimeException("Erro no switch case");
-				}
-			}
-		} else {
-			relatorio.add("HIT\t");
-			countHit++;
-		}
+	private String decToBin(int i) {
+		String linha = Integer.toBinaryString(i);
+		while (linha.length() < bitsPalavra )
+			linha = "0" + linha;
+		return linha;
 	}
 
-	//Mapeamento direto, com 3 bits para tag, 4 bits para linha e 1 bit
-	//para palavra (cache com 16 linhas, 2 palavras por linha).
-
-	private void adicionaTres(String endereco) {
-		int linha = Integer.parseInt(endereco.substring(3, 7), 2);
-		int palavra = Integer.parseInt(endereco.substring(7, 8), 2);
-
-		if (tag[linha] == null || !cache[linha][palavra].equals(endereco)) {
-			relatorio.add("MISS\t");
-			countMiss++;
-			tag[linha] = endereco.substring(0, 3);
-			for (int i = 0; i < tColuna; i++) {
-				switch (i) {
-				case 0:
-					cache[linha][i] = endereco.substring(0, 7) + "0";	break;
-				case 1:
-					cache[linha][i] = endereco.substring(0, 7) + "1";	break;		
-				default:
-					throw new RuntimeException("Erro no switch case");
-				}
-			}
-		} else {
-			relatorio.add("HIT\t");
-			countHit++;
-		}
-	}
 
 	public void printa() {
 		System.out.printf("%-9s %-9s ", "Linha", "TAG");
@@ -152,9 +72,7 @@ public class Cache {
 			System.out.printf("%-9s ", colunas[i]);
 		System.out.println("\n-----------------------------------------------------------------------------------------------");
 		for (int i = 0; i < tLinha; i++) {
-			String linha = Integer.toBinaryString(i);
-			while (linha.length() < bitsLinha )
-				linha = "0" + linha;
+			String linha = decToBin(i);
 			System.out.printf("%-10s", linha);
 			System.out.printf("%-10s", tag[i]);
 			for (int j = 0; j < tColuna; j++) {
