@@ -6,6 +6,8 @@ public class Cache {
 	
 	public static int TAM_BYTE = 8;
 	public static int BINARIO = 2;
+	public static String HIT = "HIT\t";
+	public static String MISS = "MISS\t";
 
 	private int bitsTag;
 	private int bitsLinha;
@@ -38,21 +40,20 @@ public class Cache {
 
 	}
 
-	// Mapeamento direto, com bitsTag bits para tag, bitsLinha bits para linha e
-	// bitsPalavra (cache com 4 linhas, 8 palavras por linha).
+	// Mapeamento direto, com bitsTag bits para tag, bitsLinha bits para linha e bitsPalavra para palavra
 	public void add(String endereco) {
 		int linha = Integer.parseInt(endereco.substring(bitsTag, bitsTag + bitsLinha), BINARIO);
 		int palavra = Integer.parseInt(endereco.substring(bitsTag + bitsLinha, TAM_BYTE), BINARIO);
 
 		if (tag[linha] == null || !cache[linha][palavra].equals(endereco)) {
-			relatorio.add("MISS\t");
+			relatorio.add(MISS);
 			countMiss++;
 			tag[linha] = endereco.substring(0, bitsTag);
 			for (int i = 0; i < tColuna; i++) {
 				cache[linha][i] = endereco.substring(0, TAM_BYTE - bitsPalavra) + decToBin(i);
 			}
 		} else {
-			relatorio.add("HIT\t");
+			relatorio.add(HIT);
 			countHit++;
 		}
 	}
@@ -98,8 +99,8 @@ public class Cache {
 		}
 		float total = countHit + countMiss;
 		System.out.println('\n');
-		System.out.println("Percentual de Miss: " + ((100*countMiss)/total) + "%");
 		System.out.println("Percentual de Hit: " + ((100*countHit)/total) + "%");
+		System.out.println("Percentual de Miss: " + ((100*countMiss)/total) + "%");
 	}
 
 }

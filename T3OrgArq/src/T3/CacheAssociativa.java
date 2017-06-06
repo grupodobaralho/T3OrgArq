@@ -1,196 +1,85 @@
 package T3;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
 
 public class CacheAssociativa {
 	
-	public class MemoriaAssociativa {
-		LinkedHashMap<Integer, Integer> mem;
-
-		public MemoriaAssociativa() {
-			mem = new LinkedHashMap<>();
-		}
-
-		// procura se existe tag na memAssociativa, se n„o tiver, retorna -1
-		// se tiver, retorna a posiÁ„o da cache
-		public int procura(int tag) {
-			if(mem.containsKey(tag)==false)
-				return -1;
-			else return mem.get(tag);
-		}		
-			
-	}
-
-	private int bitsLinha;
-	private int bitsPalavra;
-	private int tLinha;
-	private int tColuna;
-	private String[][] cache;
-	private MemoriaAssociativa memoriaAss = new MemoriaAssociativa();
+	public static int TAM_BYTE = 8;
+	public static int BINARIO = 2;
+	public static String HIT = "HIT\t";
+	public static String MISS = "MISS\t";
 	
+	private int bitsTag;
+	private int linhas;
+	private int bitsPalavra;
+	private int colunas;
+	private String[] memAss;
+	private String[][] cache;
 	private int countHit = 0;
 	private int countMiss = 0;
-	
-	private ArrayList<String> relatorio;
-	
 	private int contador = 0;
+	private ArrayList<String> relatorio;
 
-
-	public CacheAssociativa(int bitsLinha, int bitsPalavra) {
-			
-		this.bitsLinha = bitsLinha;
+	public CacheAssociativa(int bitsTag, int linhas, int bitsPalavra) {
+		
+		this.bitsTag = bitsTag;
 		this.bitsPalavra = bitsPalavra;
 		
-		// Quantidade de linhas da Cache
-		this.tLinha = (int) Math.pow(2, bitsLinha);	
-		// Quantidade de blocos (colunas)
-		this.tColuna = (int) Math.pow(2, bitsPalavra);
+		// Quantidade de linhas e colunas da Cache + vetor de tags
+		this.linhas = linhas;
+		this.colunas = (int) Math.pow(2, bitsPalavra);
+		memAss = new String[linhas];
 		
-		cache = new String[tLinha][tColuna];
-
+		// Instancia√ß√£o da cache e do relat√≥rio
+		cache = new String[linhas][colunas];
 		relatorio = new ArrayList<>();
 	}
 	
+	// Mapeamento associativo, com bitsTag bits para tag, linhas para linha e bitsPalavra para palavra
 	public void add(String endereco) {
-
-		if (tLinha == 4 && tColuna == 8) {
-			adicionaUm(endereco);
-		} else if (tLinha == 8 && tColuna == 4) {
-			adicionaDois(endereco);
-		} else if (tLinha == 16 && tColuna == 2) {
-			adicionaTres(endereco);
-		} else {
-			throw new RuntimeException("Erro no add da classe Cache!");
-		}
-
-	}
-	
-	// Mapeamento associativo, com 5 bits para a tag e 3 bits para palavra
-	// (cache com 4 linhas, 8 palavras por linha).
-	public void adicionaUm(String endereco){
-		int tag = Integer.parseInt(endereco.substring(0, 5), 2);
-		//int palavra = Integer.parseInt(endereco.substring(5, 8), 2);
 		
-		if(memoriaAss.procura(tag) == -1){			
-			relatorio.add("MISS\t");
-			countMiss++;
-			System.out.println("z");
-			memoriaAss.mem.put(tag, contador);
-			contador++;
-			for (int i = 0; i < tColuna; i++) {
-				switch (i) {
-				case 0:
-					cache[memoriaAss.mem.get(tag)][i] = "000";  break;
-				case 1:
-					cache[memoriaAss.mem.get(tag)][i] = "001";	break;
-				case 2:
-					cache[memoriaAss.mem.get(tag)][i] = "010";	break;
-				case 3:
-					cache[memoriaAss.mem.get(tag)][i] = "011";	break;
-				case 4:
-					cache[memoriaAss.mem.get(tag)][i] = "100";	break;
-				case 5:
-					cache[memoriaAss.mem.get(tag)][i] = "101";	break;
-				case 6:
-					cache[memoriaAss.mem.get(tag)][i] = "110";	break;
-				case 7:
-					cache[memoriaAss.mem.get(tag)][i] = "111";	break;
-				default:
-					throw new RuntimeException("Erro no switch case");
-				}
+		boolean miss = true;
+		
+		for(int i=0; i<memAss.length; i++) {
+			if(memAss[i] != null && memAss[i].equals(endereco.substring(0, bitsTag))) {
+				relatorio.add(HIT);
+				countHit++;
+				miss = false;
+				break;
 			}
-		} else {
-			relatorio.add("HIT\t");
-			countHit++;
-		}		
-	}
-	
-	// Mapeamento associativo, com 6 bits para tag e 2 bits para palavra
-	// (cache com 8 linhas, 4 palavras por linha).
-	public void adicionaDois(String endereco){
-		int tag = Integer.parseInt(endereco.substring(0, 6), 2);
-		//int palavra = Integer.parseInt(endereco.substring(6, 8), 2);
-		
-		if(memoriaAss.procura(tag) == -1){			
-			relatorio.add("MISS\t");
-			countMiss++;
-			System.out.println("z");
-			memoriaAss.mem.put(tag, contador);
-			contador++;
-			for (int i = 0; i < tColuna; i++) {
-				switch (i) {
-				case 0:
-					cache[memoriaAss.mem.get(tag)][i] = "00"; break;
-				case 1:
-					cache[memoriaAss.mem.get(tag)][i] = "01"; break;
-				case 2:
-					cache[memoriaAss.mem.get(tag)][i] = "10"; break;
-				case 3:
-					cache[memoriaAss.mem.get(tag)][i] = "11"; break;
-				default:
-					throw new RuntimeException("Erro no switch case");
-				}
-			}
-		} else {
-			relatorio.add("HIT\t");
-			countHit++;
-		}	
-		
-	}
-	
-	// Mapeamento associativo, com 7 bits para tag e 1 bit para palavra
-	// (cache com 16 linhas, 2 palavras por linha).
-	public void adicionaTres(String endereco){		
-		int tag = Integer.parseInt(endereco.substring(0, 7), 2);
-		//int palavra = Integer.parseInt(endereco.substring(7, 8), 2);
-		
-		if(memoriaAss.procura(tag) == -1){			
-			relatorio.add("MISS\t");
-			countMiss++;
-			System.out.println("z");
-			memoriaAss.mem.put(tag, contador);
-			contador++;
-			for (int i = 0; i < tColuna; i++) {
-				switch (i) {
-				case 0:
-					cache[memoriaAss.mem.get(tag)][i] = "0"; break;
-				case 1:
-					cache[memoriaAss.mem.get(tag)][i] = "1"; break;
-				default:
-					throw new RuntimeException("Erro no switch case");
-				}
-			}
-		} else {
-			relatorio.add("HIT\t");
-			countHit++;
 		}
 		
+		if(miss) {
+			memAss[(contador++)%linhas] = endereco.substring(0, bitsTag);
+			relatorio.add(MISS);
+			countMiss++;
+		}
 	}
-	/*
+
+	private String decToBin(int i, int bits) {
+		String linha = Integer.toBinaryString(i);
+		while (linha.length() < bits )
+			linha = "0" + linha;
+		return linha;
+	}
+
+
 	public void printa() {
 		System.out.printf("%-9s %-9s ", "Linha", "TAG");
-		String[] colunas = {"  000  ", "  001  ", "  010  ", "  011  ", "  100  ", "  101  ", "  110  ", "  111  "};
-		for(int i = 0; i<tColuna; i++)
-			System.out.printf("%-9s ", colunas[i]);
+		
+		for(int i = 0; i<colunas; i++)
+			System.out.printf("%-9s ", decToBin(i, bitsPalavra));
 		System.out.println("\n-----------------------------------------------------------------------------------------------");
-		for (int i = 0; i < tLinha; i++) {
-			String linha = Integer.toBinaryString(i);
-			while (linha.length() < bitsLinha )
-				linha = "0" + linha;
+		
+		for (int i = 0; i < linhas; i++) {
+			String linha = decToBin(i, (bitsTag-3));
 			System.out.printf("%-10s", linha);
-			System.out.printf("%-10s", memoriaAss.mem.keySet());
-			Set hs = memoriaAss.mem.keySet();		
-			for (int j = 0; j < tColuna; j++) {
-				if (cache[i][j] == null) {
-					System.out.printf("%-10s", "NULL ");
-				} else {
-					System.out.printf("%-10s", cache[i][j] + " ");
+			System.out.printf("%-10s", memAss[i]);
+			
+			if (memAss[i] != null) {
+				for (int j = 0; j < colunas; j++) {
+					System.out.printf("%-10s", decToBin(j, bitsPalavra));
 				}
-
 			}
 			System.out.println();
 		}
@@ -205,11 +94,11 @@ public class CacheAssociativa {
 			System.out.printf(str);
 			count++;
 		}
+		
 		float total = countHit + countMiss;
 		System.out.println('\n');
-		System.out.println("Percentual de Miss: " + ((100*countMiss)/total) + "%");
 		System.out.println("Percentual de Hit: " + ((100*countHit)/total) + "%");
+		System.out.println("Percentual de Miss: " + ((100*countMiss)/total) + "%");
 	}
-	*/
 
 }
